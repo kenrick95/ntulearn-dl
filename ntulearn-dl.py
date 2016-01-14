@@ -1,6 +1,7 @@
 #!/usr/bin/env
 # -*- coding: utf-8 -*-
 
+import config
 import os
 import time
 import math
@@ -133,6 +134,9 @@ def download(session, url, path):
         print 'Could not find the file'
         return
 
+    valid_chars = "-_.() "
+    path = "".join([x for x in path if (x.isalnum() or x in valid_chars or x == os.path.sep)])
+
     if not os.path.exists(path):
         os.makedirs(path)
 
@@ -205,7 +209,7 @@ def iter(session, course_id, current_map_item, path):
 
         if linktype.lower() == 'resource/x-bb-folder':
             iter(session, course_id, map_item, os.path.join(path, name))
-        elif linktype.lower() == 'resource/x-bb-document':
+        elif linktype.lower() == 'resource/x-bb-document' or linktype.lower() == 'resource/x-bb-file':
             download_document(session, course_id, content_id, path)
 
 
@@ -227,8 +231,8 @@ def main():
 	}
 
     data = {
-        'username' : 'lwan001',
-        'password' : 'zwdpznjdtwd2A'
+        'username' : config.data['username'],
+        'password' : config.data['password']
     }
 
     url = 'https://ntulearn.ntu.edu.sg/webapps/Bb-mobile-BBLEARN/sslUserLogin'
