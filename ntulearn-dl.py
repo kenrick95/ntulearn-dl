@@ -14,6 +14,8 @@ import urllib
 import xml.etree.ElementTree as ET
 
 BASE_DIR = os.path.dirname(__file__)
+if os.path.isdir(config.folder_path):
+    BASE_DIR = os.path.relpath(config.folder_path)
 
 NTULEARN_BASE_URL = 'https://ntulearn.ntu.edu.sg'
 
@@ -145,6 +147,8 @@ def download(session, url, path):
     if os.path.isfile(uri):
         if os.path.getsize(uri) != filesize:
             print 'file seems corrupted, download again'
+        elif config.replace_files:
+            print 'downloading again'
         else:
             print 'already downloaded, skipping...'
             print
@@ -277,8 +281,18 @@ def main():
         course_id = course.get('bbid')
         course_name = course.get('name')
         course_type = course.get('courseid')
+
         print '-' * 30
         print 'Course {} - {}: {}'.format(idx, course_type, course_name)
+
+        ok = False
+        for c in config.download_courses:
+            if course_name.count(c) > 0:
+                ok = True
+                break
+        if not ok:
+            print "Course not downloaded."
+            continue
 
         params={
             'v' : '1',
